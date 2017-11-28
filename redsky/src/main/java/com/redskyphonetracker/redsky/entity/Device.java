@@ -5,6 +5,7 @@ import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 @Entity
@@ -19,8 +20,21 @@ public class Device {
 	private String manufacturer;
 	private boolean privateMode;
 	
+	@OneToOne
+	private DevLocation lastLocation;
+	
 	@ManyToMany
 	private List<DevLocation> location;
+	
+	
+
+	public DevLocation getLastLocation() {
+		return lastLocation;
+	}
+
+	public void setLastLocation(DevLocation lastLocation) {
+		this.lastLocation = lastLocation;
+	}
 
 	public Long getPhoneNumber() {
 		return phoneNumber;

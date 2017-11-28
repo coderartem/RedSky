@@ -8,6 +8,4 @@ import com.redskyphonetracker.redsky.pojo.CivicAddress;
 public interface LocationRepository extends JpaRepository<DevLocation, Long> {
 
 	DevLocation findByCivicAddress(CivicAddress civic);
-
-	
 }

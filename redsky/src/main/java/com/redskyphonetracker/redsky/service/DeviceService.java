@@ -33,12 +33,15 @@ public class DeviceService {
 	/**
 	 * Register new device
 	 * @param newDevice
+	 * @return 
 	 */
-	public void register(DeviceDto newDevice) {
+	public boolean register(DeviceDto newDevice) {
+		if(deviceRepository.findByPhoneNumber(newDevice.getPhoneNumber())!=null) return false;
 		Device device = deviceMapper.dtoToDevice(newDevice);
 		device.setLocation(new ArrayList<DevLocation>());
 		device.setPrivateMode(false);
 		deviceRepository.save(device);
+		return true;
 	}
 
 	/**
@@ -59,7 +62,8 @@ public class DeviceService {
 	 * @return List of all devices in the same city
 	 */
 	public List<DeviceDto> getAllInTheCity(String city, String state) {
-			return deviceMapper.devicesToDtos(deviceRepository.findByLocationCivicAddressCityAndLocationCivicAddressState(city, state));
+		List<DeviceDto> result = deviceMapper.devicesToDtos(deviceRepository.findByLastLocationCivicAddressCityAndLastLocationCivicAddressState(city, state)); 
+		return result;
 	}
 
 	/**
@@ -71,7 +75,6 @@ public class DeviceService {
 	public boolean unregister(Long phone) {
 		Device device = deviceRepository.findByPhoneNumber(phone);
 		if(device==null) return false;
-		device.getLocation().clear();
 		deviceRepository.delete(device);
 		return true;
 	}
@@ -82,11 +85,11 @@ public class DeviceService {
 	 * @param privateMode 
 	 * @return boolean
 	 */
+	@Transactional
 	public boolean setPrivate(Long phoneNumber, boolean privateMode) {
 		Device device = deviceRepository.findByPhoneNumber(phoneNumber);
 		if(device==null) return false;
 		device.setPrivateMode(privateMode);
-		deviceRepository.saveAndFlush(device);
 		return true;
 	}
 

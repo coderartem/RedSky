@@ -48,7 +48,6 @@ public class LocationService {
 		Device device = deviceRepository.findByPhoneNumber(phoneNumber);
 		if(device==null || device.isPrivateMode())  return false;
 					
-				
 				GeoApiContext context = new GeoApiContext.Builder()
 					    .apiKey("AIzaSyBHrjcu5OqJT7bSdEGhxh1hn67S57nzccg")
 					    .build();
@@ -61,13 +60,15 @@ public class LocationService {
 						e.printStackTrace();
 					}
 										
-					DevLocation location = locationMapper.buildDeviceLocation(civic, geoAddress);
+			DevLocation location = locationMapper.buildDeviceLocation(civic, geoAddress);
 			
 			location.setTimestamp(new Timestamp(System.currentTimeMillis()));
 			locationRepository.saveAndFlush(location);
 			
 			device.getLocation().add(location);
+			device.setLastLocation(location);
 			deviceRepository.saveAndFlush(device);
+			
 		 return true;
 	}
 
@@ -99,14 +100,15 @@ public class LocationService {
 				e.printStackTrace();
 			}
 			
-			CivicAddress civic = buildCivicAddress(geoFormattedAddress);
+		CivicAddress civic = buildCivicAddress(geoFormattedAddress);
 			
-			DevLocation location = locationMapper.buildDeviceLocation(civic, geo);
-			location.setTimestamp(new Timestamp(System.currentTimeMillis()));
-			locationRepository.saveAndFlush(location);
+		DevLocation location = locationMapper.buildDeviceLocation(civic, geo);
+		location.setTimestamp(new Timestamp(System.currentTimeMillis()));
+		locationRepository.saveAndFlush(location);
 			
-			device.getLocation().add(location);
-			deviceRepository.saveAndFlush(device);
+		device.getLocation().add(location);
+		device.setLastLocation(location);
+		deviceRepository.saveAndFlush(device);
 			
 		return true;
 	}
@@ -117,10 +119,9 @@ public class LocationService {
 	 * @return new CivicAddress object
 	 */
 	private CivicAddress buildCivicAddress(String geoFormattedAddress) {
-		
 		String [] temp = geoFormattedAddress.split(",");
 		String [] temp2 = temp[2].split(" ");
-		return new CivicAddress(temp[0],temp[1],temp2[0],temp2[1]);
+		return new CivicAddress(temp[0],temp[1],temp2[1],temp2[2]);
 	}
 
 	
@@ -132,7 +133,6 @@ public class LocationService {
 	public List<DeviceLocationDto> getLastLocations(Long phoneNumber) {
 		Device device = deviceRepository.findByPhoneNumber(phoneNumber);
 		return device!=null?locationMapper.LocationsToDtos(device.getLocation()):null;
-		
 	}
 
 	/**
@@ -142,7 +142,9 @@ public class LocationService {
 	 */
 	public DeviceLocationDto getLastLocation(Long phoneNumber) {
 		Device device = deviceRepository.findByPhoneNumber(phoneNumber);
-		return device!=null?locationMapper.locationToDto(device.getLocation().get(device.getLocation().size()-1)):null;
+		if(device!=null && device.getLocation().size()!=0) {
+			return locationMapper.locationToDto(device.getLastLocation());
+		}else return null;
 	}
 
 	

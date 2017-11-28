@@ -10,7 +10,7 @@ public interface DeviceRepository extends JpaRepository <Device, Integer> {
 
 	Device findByPhoneNumber(Long phone);
 
-	List<Device> findByLocationCivicAddressCityAndLocationCivicAddressState(String city, String state);
+	List<Device> findByLastLocationCivicAddressCityAndLastLocationCivicAddressState(String city, String state);
 
 	
 }
