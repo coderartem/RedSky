@@ -1,5 +1,5 @@
 # RedSky
-Builded as RESTfull webservice
+Built as RESTfull webservice
 
 To run application:
 (You need to have Maven and Spring Boot installed in your IDE)
